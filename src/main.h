@@ -115,7 +115,7 @@ void init_wifiManager()
   wifiManager.addParameter(&blinker_auth);
 
   // wifiManager.resetSettings(); //reset saved settings
-  if (!wifiManager.autoConnect("懒人开关"))
+  if (!wifiManager.autoConnect("小熊夜灯"))
   {
     // reset and try again, or maybe put it to deep sleep
     ESP.reset();

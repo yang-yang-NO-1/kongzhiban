@@ -17,21 +17,25 @@ Servo led;            // create servo object to control a led
 OneButton button(PIN_INPUT, true);
 uint8_t i = 0;
 bool j = 1, breath_flag = 1;
-/* LED亮度等级 PWM表,指数曲线 ，此表使用工程目录下的python脚本index_wave.py生成*/
-const uint16_t indexWave[] = {
-    1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4,
-    4, 5, 5, 6, 7, 8, 9, 10, 11, 13,
-    15, 17, 19, 22, 25, 28, 32, 36,
-    41, 47, 53, 61, 69, 79, 89, 102,
-    116, 131, 149, 170, 193, 219, 250,
-    284, 323, 367, 417, 474, 539, 613,
-    697, 792, 901, 1024, 1024, 901, 792,
-    697, 613, 539, 474, 417, 367, 323,
-    284, 250, 219, 193, 170, 149, 131,
-    116, 102, 89, 79, 69, 61, 53, 47, 41,
-    36, 32, 28, 25, 22, 19, 17, 15, 13,
-    11, 10, 9, 8, 7, 6, 5, 5, 4, 4, 3, 3,
-    2, 2, 2, 2, 1, 1, 1, 1};
+const uint16_t indexWave[256] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3,
+    3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6,
+    6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10,
+    11, 11, 11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16, 17,
+    17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25,
+    25, 26, 27, 27, 28, 29, 29, 30, 31, 31, 32, 33, 34, 34, 35,
+    36, 37, 38, 38, 39, 40, 41, 42, 42, 43, 44, 45, 46, 47, 48,
+    49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+    64, 65, 66, 68, 69, 70, 71, 72, 73, 75, 76, 77, 78, 80, 81,
+    82, 84, 85, 86, 88, 89, 90, 92, 93, 94, 96, 97, 99, 100, 102,
+    103, 105, 106, 108, 109, 111, 112, 114, 115, 117, 119, 120, 122, 124, 125,
+    127, 129, 130, 132, 134, 136, 137, 139, 141, 143, 145, 146, 148, 150, 152,
+    154, 156, 158, 160, 162, 164, 166, 168, 170, 172, 174, 176, 178, 180, 182,
+    184, 186, 188, 191, 193, 195, 197, 199, 202, 204, 206, 209, 211, 213, 215,
+    218, 220, 223, 225, 227, 230, 232, 235, 237, 240, 242, 245, 247, 250, 252,
+    255};
 
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 StaticJsonDocument<200> doc;
@@ -65,54 +69,27 @@ void DuringLongPress(void *oneButton)
 }
 
 // 呼吸效果
-// void breath()
-// {
-//   if (j)
-//   {
-//     led.write(map(indexWave[i], 0, 1024, 0, 180));
-//     pixels.setBrightness(map(indexWave[i], 0, 1024, 0, 255));
-//     Serial.println(map(indexWave[i], 0, 1024, 0, 255));
-//     i++;
-//     pixels.show();
-//     if (i == 110)
-//     {
-//       j = !j;
-//     }
-//   }
-//   else
-//   {
-//     led.write(map(indexWave[i], 0, 1024, 0, 180));
-//     pixels.setBrightness(map(indexWave[i], 0, 1024, 0, 255));
-//     Serial.println(map(indexWave[i], 0, 1024, 0, 255));
-//     i--;
-//     pixels.show();
-//     if (i == 0)
-//     {
-//       j = !j;
-//     }
-//   }
-// }
 void breath()
 {
   if (j)
   {
-    led.write(i);
-    pixels.setBrightness((uint8_t)map(i, 0, 180, 0, 255));
+    led.write(map(indexWave[i], 0, 255, 0, 180));
+    pixels.setBrightness(map(indexWave[i], 0, 255, 1, 255));
     pixels.show();
-    Serial.println((uint8_t)map(i, 0, 180, 0, 255));
+    Serial.println(map(indexWave[i], 0, 255, 1, 255));
     i++;
-    if (i == 180)
+    if (i == 255)
     {
       j = !j;
     }
   }
   else
   {
-    i--;
-    led.write(i);
-    pixels.setBrightness((uint8_t)map(i, 0, 180, 0, 255));
+    led.write(map(indexWave[i], 0, 255, 0, 180));
+    pixels.setBrightness(map(indexWave[i], 0, 255, 1, 255));
     pixels.show();
-    Serial.println((uint8_t)map(i, 0, 180, 0, 255));
+    Serial.println(map(indexWave[i], 0, 255, 1, 255));
+    i--;
     if (i == 0)
     {
       j = !j;
